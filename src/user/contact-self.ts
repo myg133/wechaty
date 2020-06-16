@@ -1,7 +1,8 @@
 /**
- *   Wechaty - https://github.com/wechaty/wechaty
+ *   Wechaty Chatbot SDK - https://github.com/wechaty/wechaty
  *
- *   @copyright 2016-2018 Huan LI <zixia@zixia.net>
+ *   @copyright 2016 Huan LI (李卓桓) <https://github.com/huan>, and
+ *                   Wechaty Contributors <https://github.com/wechaty>.
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
@@ -15,17 +16,15 @@
  *   See the License for the specific language governing permissions and
  *   limitations under the License.
  *
- *   @ignore
  */
-import { FileBox } from 'file-box'
-
 import {
+  FileBox,
   log,
 }           from '../config'
 
 import {
   guardQrCodeValue,
-}                       from '../helper-functions/pure/guard-qrcode-value'
+}                       from '../helper-functions/pure/guard-qr-code-value'
 
 import {
   Contact,
@@ -71,10 +70,10 @@ export class ContactSelf extends Contact {
    * })
    *
    * @example <caption>SET the avatar for a bot</caption>
-   * import { FileBox }  from 'file-box'
+   * import { FileBox }  from 'wechaty'
    * bot.on('login', (user: ContactSelf) => {
    *   console.log(`user ${user} login`)
-   *   const fileBox = FileBox.fromUrl('https://chatie.io/wechaty/images/bot-qr-code.png')
+   *   const fileBox = FileBox.fromUrl('https://wechaty.github.io/wechaty/images/bot-qr-code.png')
    *   await user.avatar(fileBox)
    *   console.log(`Change bot avatar successfully!`)
    * })
@@ -121,7 +120,7 @@ export class ContactSelf extends Contact {
       throw new Error('only can get qrcode for the login userself')
     }
 
-    const qrcodeValue = await this.puppet.contactSelfQrcode()
+    const qrcodeValue = await this.puppet.contactSelfQRCode()
     return guardQrCodeValue(qrcodeValue)
   }
 

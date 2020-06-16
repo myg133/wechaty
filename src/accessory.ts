@@ -1,3 +1,22 @@
+/**
+ *   Wechaty Chatbot SDK - https://github.com/wechaty/wechaty
+ *
+ *   @copyright 2016 Huan LI (李卓桓) <https://github.com/huan>, and
+ *                   Wechaty Contributors <https://github.com/wechaty>.
+ *
+ *   Licensed under the Apache License, Version 2.0 (the "License");
+ *   you may not use this file except in compliance with the License.
+ *   You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *   Unless required by applicable law or agreed to in writing, software
+ *   distributed under the License is distributed on an "AS IS" BASIS,
+ *   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *   See the License for the specific language governing permissions and
+ *   limitations under the License.
+ *
+ */
 import { EventEmitter }     from 'events'
 
 import { instanceToClass }  from 'clone-class'
@@ -9,8 +28,8 @@ import { Wechaty }  from './wechaty'
 // use Symbol to prevent conflicting with the child class properties
 // This symbol must be exported (for now).
 // See: https://github.com/Microsoft/TypeScript/issues/20080
-export const SYMBOL_NAME    = Symbol('name')
-export const SYMBOL_COUNTER = Symbol('counter')
+const SYMBOL_NAME    = Symbol('name')
+const SYMBOL_COUNTER = Symbol('counter')
 
 let COUNTER = 0
 
@@ -98,35 +117,22 @@ export abstract class Accessory extends EventEmitter {
    *
    * 2. Instance Properties & Methods
    *
-   * The ability of set different `puppet` to the instance is required.
-   * For example: the Wechaty instances have to have different `puppet`.
+   *    DEPRECATED: The ability of set different `puppet` to the instance is required.
+   *      For example: the Wechaty instances have to have different `puppet`.
+   *
+   *    Huan(202003): simplify the logic: do not use Accessory to
+   *      set different puppet for different instances
    */
-  private _puppet?  : Puppet
-
-  /**
-   * @ignore
-   */
-  public set puppet (puppet: Puppet) {
-    log.silly('Accessory', '<%s> set puppet = "%s"',
-      this[SYMBOL_NAME] || this,
-      puppet,
-    )
-    if (this._puppet) {
-      throw new Error('puppet can not be set twice')
-    }
-    this._puppet = puppet
-  }
 
   /**
    * @ignore
    *
    * instance.puppet
    *
-   * Needs to support different `puppet` between instances.
-   *
-   * For example: every Wechaty instance needs its own `puppet`
-   *
-   * So: that's the reason that there's no `private _wechaty: Wechaty` for the instance.
+   *  Huan(202003)
+   *    DEPRECATED: Needs to support different `puppet` between instances.
+   *      For example: every Wechaty instance needs its own `puppet`
+   *      So: that's the reason that there's no `private _wechaty: Wechaty` for the instance.
    *
    */
   public get puppet (): Puppet {
@@ -135,9 +141,10 @@ export abstract class Accessory extends EventEmitter {
     //                               this[SYMBOL_NAME] || this,
     //           )
 
-    if (this._puppet) {
-      return this._puppet
-    }
+    // Huan(202003): DEPRECATED
+    // if (this._puppet) {
+    //   return this._puppet
+    // }
 
     /**
      * Get `puppet` from Class Static puppet property
@@ -155,6 +162,7 @@ export abstract class Accessory extends EventEmitter {
    *  FriendRequest.wechaty
    *  Message.wechaty
    *  Room.wechaty
+   *  ... etc
    *
    * So it only need one `wechaty` for all the instances
    */

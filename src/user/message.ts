@@ -1,7 +1,8 @@
 /**
- *   Wechaty - https://github.com/wechaty/wechaty
+ *   Wechaty Chatbot SDK - https://github.com/wechaty/wechaty
  *
- *   @copyright 2016-2018 Huan LI <zixia@zixia.net>
+ *   @copyright 2016 Huan LI (李卓桓) <https://github.com/huan>, and
+ *                   Wechaty Contributors <https://github.com/wechaty>.
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
@@ -14,14 +15,11 @@
  *   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *   See the License for the specific language governing permissions and
  *   limitations under the License.
- *   @ignore
+ *
  */
 import {
   instanceToClass,
 }                       from 'clone-class'
-import {
-  FileBox,
-}                       from 'file-box'
 
 import {
   MessagePayload,
@@ -29,15 +27,16 @@ import {
   MessageType,
 }                       from 'wechaty-puppet'
 
-import {
-  escapeRegExp,
-}                       from '../helper-functions/pure/escape-regexp'
+import { escapeRegExp }     from '../helper-functions/pure/escape-regexp'
+import { timestampToDate }  from '../helper-functions/pure/timestamp-to-date'
 
 import {
   Accessory,
 }                       from '../accessory'
 import {
   AT_SEPRATOR_REGEX,
+  FileBox,
+
   log,
   Raven,
 }                       from '../config'
@@ -57,14 +56,7 @@ import {
 import {
   MiniProgram,
 }                       from './mini-program'
-
-export interface MessageUserQueryFilter {
-  from? : Contact,
-  text? : string | RegExp
-  room? : Room
-  type? : MessageType
-  to?   : Contact
-}
+import { Image } from './image'
 
 /**
  * All wechat messages will be encapsulated as a Message.
@@ -82,23 +74,22 @@ export class Message extends Accessory implements Sayable {
   /**
    * @ignore
    */
-  // tslint:disable-next-line:variable-name
   public static readonly Type = MessageType
 
   /**
    * Find message in cache
    */
   public static async find<T extends typeof Message> (
-    this      : T,
-    userQuery : string | MessageUserQueryFilter,
+    this  : T,
+    query : string | MessageQueryFilter,
   ): Promise<T['prototype'] | null> {
-    log.verbose('Message', 'find(%s)', JSON.stringify(userQuery))
+    log.verbose('Message', 'find(%s)', JSON.stringify(query))
 
-    if (typeof userQuery === 'string') {
-      userQuery = { text: userQuery }
+    if (typeof query === 'string') {
+      query = { text: query }
     }
 
-    const messageList = await this.findAll(userQuery)
+    const messageList = await this.findAll(query)
     if (messageList.length < 1) {
       return null
     }
@@ -114,27 +105,15 @@ export class Message extends Accessory implements Sayable {
    * Find messages in cache
    */
   public static async findAll<T extends typeof Message> (
-    this       : T,
-    userQuery? : MessageUserQueryFilter,
+    this   : T,
+    query? : MessageQueryFilter,
   ): Promise<Array<T['prototype']>> {
-    log.verbose('Message', 'findAll(%s)', JSON.stringify(userQuery) || '')
-
-    let puppetQuery: undefined | MessageQueryFilter
-
-    if (userQuery) {
-      puppetQuery = {
-        fromId : userQuery.from && userQuery.from.id,
-        roomId : userQuery.room && userQuery.room.id,
-        text   : userQuery.text,
-        toId   : userQuery.to && userQuery.to.id,
-        type   : userQuery.type,
-      }
-    }
+    log.verbose('Message', 'findAll(%s)', JSON.stringify(query) || '')
 
     const invalidDict: { [id: string]: true } = {}
 
     try {
-      const MessageIdList = await this.puppet.messageSearch(puppetQuery)
+      const MessageIdList = await this.puppet.messageSearch(query)
       const messageList = MessageIdList.map(id => this.load(id))
       await Promise.all(
         messageList.map(
@@ -208,7 +187,6 @@ export class Message extends Accessory implements Sayable {
       this.constructor.name,
     )
 
-    // tslint:disable-next-line:variable-name
     const MyClass = instanceToClass(this, Message)
 
     if (MyClass === Message) {
@@ -262,6 +240,18 @@ export class Message extends Accessory implements Sayable {
     }
 
     return msgStrList.join('')
+  }
+
+  public talker (): Contact {
+    return this.from()!
+  }
+
+  public conversation (): Contact | Room {
+    if (this.room()) {
+      return this.room()!
+    } else {
+      return this.from()!
+    }
   }
 
   /**
@@ -426,13 +416,14 @@ export class Message extends Accessory implements Sayable {
     }
   }
 
-  public async say (text:    string, mention?: Contact | Contact[]) : Promise<void | Message>
-  public async say (contact: Contact)                               : Promise<void | Message>
-  public async say (file:    FileBox)                               : Promise<void | Message>
-  public async say (url:     UrlLink)                               : Promise<void | Message>
-  public async say (mini:    MiniProgram)                           : Promise<void | Message>
+  public say (text:    string, mention?: Contact | Contact[]) : Promise<void | Message>
+  public say (message: Message)                               : Promise<void | Message>
+  public say (contact: Contact)                               : Promise<void | Message>
+  public say (file:    FileBox)                               : Promise<void | Message>
+  public say (url:     UrlLink)                               : Promise<void | Message>
+  public say (mini:    MiniProgram)                           : Promise<void | Message>
 
-  public async say (...args: never[]): Promise<never>
+  public say (...args: never[]): Promise<never>
   /**
    * Reply a Text or Media File message to the sender.
    * > Tips:
@@ -447,7 +438,7 @@ export class Message extends Accessory implements Sayable {
    * @returns {Promise<void | Message>}
    *
    * @example
-   * import { FileBox }  from 'file-box'
+   * import { FileBox }  from 'wechaty'
    * const bot = new Wechaty()
    * bot
    * .on('message', async m => {
@@ -455,7 +446,7 @@ export class Message extends Accessory implements Sayable {
    * // 1. send Image
    *
    *   if (/^ding$/i.test(m.text())) {
-   *     const fileBox = FileBox.fromUrl('https://chatie.io/wechaty/images/bot-qr-code.png')
+   *     const fileBox = FileBox.fromUrl('https://wechaty.github.io/wechaty/images/bot-qr-code.png')
    *     await msg.say(fileBox)
    *     const message = await msg.say(fileBox) // only supported by puppet-padplus
    *   }
@@ -511,7 +502,12 @@ export class Message extends Accessory implements Sayable {
    * .start()
    */
   public async say (
-    textOrContactOrFileOrUrlOrMini : string | Contact | FileBox | UrlLink | MiniProgram,
+    textOrContactOrFileOrUrlOrMini :  string
+                                    | Message
+                                    | Contact
+                                    | FileBox
+                                    | UrlLink
+                                    | MiniProgram,
   ): Promise<void | Message> {
     log.verbose('Message', 'say(%s)', textOrContactOrFileOrUrlOrMini)
 
@@ -519,47 +515,71 @@ export class Message extends Accessory implements Sayable {
     const from = this.from()
     // const to   = this.to()
     const room = this.room()
+
+    let conversationId: string
+    let conversation
+    if (room) {
+      conversation = room
+      conversationId = room.id
+    } else if (from) {
+      conversation = from
+      conversationId = from.id
+    } else {
+      throw new Error('neither room nor from?')
+    }
+
+    /**
+     * Support say a existing message: just forward it.
+     */
+    if (textOrContactOrFileOrUrlOrMini instanceof Message) {
+      return textOrContactOrFileOrUrlOrMini.forward(conversation)
+    }
+
     let msgId: void | string
     if (typeof textOrContactOrFileOrUrlOrMini === 'string') {
       /**
        * Text Message
        */
-      msgId = await this.puppet.messageSendText({
-        contactId : (from && from.id) || undefined,
-        roomId    : (room && room.id) || undefined,
-      }, textOrContactOrFileOrUrlOrMini)
+      // msgId = await this.puppet.messageSendText({
+      //   contactId : (from && from.id) || undefined,
+      //   roomId    : (room && room.id) || undefined,
+      // }, textOrContactOrFileOrUrlOrMini)
+      msgId = await this.puppet.messageSendText(
+        conversationId,
+        textOrContactOrFileOrUrlOrMini,
+      )
     } else if (textOrContactOrFileOrUrlOrMini instanceof Contact) {
       /**
        * Contact Card
        */
-      msgId = await this.puppet.messageSendContact({
-        contactId : (from && from.id) || undefined,
-        roomId    : (room && room.id) || undefined,
-      }, textOrContactOrFileOrUrlOrMini.id)
+      msgId = await this.puppet.messageSendContact(
+        conversationId,
+        textOrContactOrFileOrUrlOrMini.id,
+      )
     } else if (textOrContactOrFileOrUrlOrMini instanceof FileBox) {
       /**
        * File Message
        */
-      msgId = await this.puppet.messageSendFile({
-        contactId : (from && from.id) || undefined,
-        roomId    : (room && room.id) || undefined,
-      }, textOrContactOrFileOrUrlOrMini)
+      msgId = await this.puppet.messageSendFile(
+        conversationId,
+        textOrContactOrFileOrUrlOrMini,
+      )
     } else if (textOrContactOrFileOrUrlOrMini instanceof UrlLink) {
       /**
        * Link Message
        */
-      msgId = await this.puppet.messageSendUrl({
-        contactId : (from && from.id) || undefined,
-        roomId    : (room && room.id) || undefined,
-      }, textOrContactOrFileOrUrlOrMini.payload)
+      msgId = await this.puppet.messageSendUrl(
+        conversationId,
+        textOrContactOrFileOrUrlOrMini.payload,
+      )
     } else if (textOrContactOrFileOrUrlOrMini instanceof MiniProgram) {
       /**
        * MiniProgram
        */
-      msgId = await this.puppet.messageSendMiniProgram({
-        contactId : (from && from.id) || undefined,
-        roomId    : (room && room.id) || undefined,
-      }, textOrContactOrFileOrUrlOrMini.payload)
+      msgId = await this.puppet.messageSendMiniProgram(
+        conversationId,
+        textOrContactOrFileOrUrlOrMini.payload,
+      )
     } else {
       throw new Error('unknown msg: ' + textOrContactOrFileOrUrlOrMini)
     }
@@ -587,6 +607,7 @@ export class Message extends Accessory implements Sayable {
    */
 
   public async recall (): Promise<boolean> {
+    log.verbose('Message', 'recall()')
     const isSuccess = await this.puppet.messageRecall(this.id)
     return isSuccess
   }
@@ -665,22 +686,20 @@ export class Message extends Accessory implements Sayable {
      * Use mention list if mention list is available
      * otherwise, process the message and get the mention list
      */
-    if (this.payload && this.payload.mentionIdList) {
+    if (this.payload && 'mentionIdList' in this.payload) {
       const idToContact = async (id: string) => {
         const contact = this.wechaty.Contact.load(id)
         await contact.ready()
         return contact
       }
-      return Promise.all(this.payload.mentionIdList.map(idToContact))
+      return Promise.all(this.payload.mentionIdList?.map(idToContact) ?? [])
     }
 
     /**
      * define magic code `8197` to identify @xxx
      * const AT_SEPRATOR = String.fromCharCode(8197)
      */
-    const AT_SEPRATOR = AT_SEPRATOR_REGEX
-
-    const atList = this.text().split(AT_SEPRATOR)
+    const atList = this.text().split(AT_SEPRATOR_REGEX)
     // console.log('atList: ', atList)
     if (atList.length === 0) return []
 
@@ -884,21 +903,12 @@ export class Message extends Accessory implements Sayable {
   public async forward (to: Room | Contact): Promise<void> {
     log.verbose('Message', 'forward(%s)', to)
 
-    let roomId
-    let contactId
-
-    if (to instanceof Room) {
-      roomId = to.id
-    } else if (to instanceof Contact) {
-      contactId = to.id
-    }
+    // let roomId
+    // let contactId
 
     try {
       await this.puppet.messageForward(
-        {
-          contactId,
-          roomId,
-        },
+        to.id,
         this.id,
       )
     } catch (e) {
@@ -915,9 +925,8 @@ export class Message extends Accessory implements Sayable {
       throw new Error('no payload')
     }
 
-    // convert the unit timestamp to milliseconds
-    // (from seconds to milliseconds)
-    return new Date(1000 * this.payload.timestamp)
+    const timestamp = this.payload.timestamp
+    return timestampToDate(timestamp)
   }
 
   /**
@@ -957,11 +966,33 @@ export class Message extends Accessory implements Sayable {
    * fileBox.toFile(fileName)
    */
   public async toFileBox (): Promise<FileBox> {
+    log.verbose('Message', 'toFileBox()')
     if (this.type() === Message.Type.Text) {
       throw new Error('text message no file')
     }
     const fileBox = await this.puppet.messageFile(this.id)
     return fileBox
+  }
+
+  /**
+   * Extract the Image File from the Message, so that we can use different image sizes.
+   * > Tips:
+   * This function is depending on the Puppet Implementation, see [puppet-compatible-table](https://github.com/wechaty/wechaty/wiki/Puppet#3-puppet-compatible-table)
+   *
+   * @returns {Image}
+   *
+   * @example <caption>Save image file from a message</caption>
+   * const image = message.toImage()
+   * const fileBox = await image.artwork()
+   * const fileName = fileBox.name
+   * fileBox.toFile(fileName)
+   */
+  public toImage (): Image {
+    log.verbose('Message', 'toImage() for message id: %s', this.id)
+    if (this.type() !== Message.Type.Image) {
+      throw new Error(`not a image type message. type: ${this.type()}`)
+    }
+    return this.wechaty.Image.create(this.id)
   }
 
   /**

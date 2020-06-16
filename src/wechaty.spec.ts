@@ -1,9 +1,10 @@
 #!/usr/bin/env ts-node
 
 /**
- *   Wechaty - https://github.com/wechaty/wechaty
+ *   Wechaty Chatbot SDK - https://github.com/wechaty/wechaty
  *
- *   @copyright 2016-2018 Huan LI <zixia@zixia.net>
+ *   @copyright 2016 Huan LI (李卓桓) <https://github.com/huan>, and
+ *                   Wechaty Contributors <https://github.com/wechaty>.
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
@@ -18,7 +19,6 @@
  *   limitations under the License.
  *
  */
-// tslint:disable:no-shadowed-variable
 import test  from 'blue-tape'
 import sinon from 'sinon'
 
@@ -150,6 +150,79 @@ test('on(event, Function)', async t => {
 
 })
 
+test('test async error', async (t) => {
+
+  // Do not modify the gloabl Wechaty instance
+  class MyWechatyTest extends Wechaty {}
+
+  const EXPECTED_ERROR = new Error('test')
+
+  const bot = new MyWechatyTest({
+    puppet: new PuppetMock(),
+  })
+
+  const asyncErrorFunction = function () {
+    return new Promise((resolve, reject) => {
+      setTimeout(function () {
+        reject(EXPECTED_ERROR)
+      }, 100)
+      // tslint ask resolve must be called,
+      // so write a fasly value, so that it never called
+      if (+new Date() < 0) {
+        resolve()
+      }
+    })
+  }
+
+  bot.on('message', async () => {
+    await asyncErrorFunction()
+  })
+  bot.on('error', (e) => {
+    t.ok(e.message === EXPECTED_ERROR.message)
+  })
+
+  bot.emit('message', {} as any)
+
+  await bot.stop()
+})
+
+test('use plugin', async (t) => {
+
+  // Do not modify the gloabl Wechaty instance
+  class MyWechatyTest extends Wechaty {}
+
+  let result = ''
+
+  const myGlobalPlugin = function () {
+    return function (bot: Wechaty) {
+      bot.on('message', () => (result += 'FROM_GLOBAL_PLUGIN:'))
+    }
+  }
+
+  const myPlugin = function () {
+    return function (bot: Wechaty) {
+      bot.on('message', () => (result += 'FROM_MY_PLUGIN:'))
+    }
+  }
+
+  MyWechatyTest.use(myGlobalPlugin())
+
+  const bot = new MyWechatyTest({
+    puppet: new PuppetMock(),
+  })
+
+  bot.use(myPlugin())
+
+  bot.on('message', () => (result += 'FROM_BOT'))
+
+  bot.emit('message', {} as any)
+
+  await bot.stop()
+
+  t.ok(result === 'FROM_GLOBAL_PLUGIN:FROM_MY_PLUGIN:FROM_BOT')
+
+})
+
 test('initPuppetAccessory()', async t => {
   const wechatyTest = new WechatyTest()
 
@@ -191,12 +264,12 @@ test('@event ready', async t => {
   await wechaty.start()
   t.true(spy.notCalled, 'should no ready event right start wechaty started')
 
-  puppet.emit('ready')
+  puppet.emit('ready', { data: 'test' })
   t.true(spy.calledOnce, 'should fire ready event after puppet ready')
 
   await wechaty.stop()
   await wechaty.start()
-  puppet.emit('ready')
+  puppet.emit('ready', { data: 'test' })
 
   t.true(spy.calledTwice, 'should fire ready event second time after stop/start wechaty')
 
@@ -221,7 +294,7 @@ test('ready()', async t => {
 
   t.true(spy.notCalled, 'should not ready after right start wechaty')
 
-  puppet.emit('ready')
+  puppet.emit('ready', { data: 'test' })
   await new Promise(resolve => setImmediate(resolve))
   t.true(spy.calledOnce, 'should ready after puppet ready')
 
@@ -231,7 +304,7 @@ test('ready()', async t => {
     .then(spy)
     .catch(e => t.fail('rejection: ' + e))
 
-  puppet.emit('ready')
+  puppet.emit('ready', { data: 'test' })
   await new Promise(resolve => setImmediate(resolve))
   t.true(spy.calledTwice, 'should ready again after stop/start wechaty')
 

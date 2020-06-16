@@ -1,7 +1,8 @@
 /**
- *   Wechaty - https://github.com/wechaty/wechaty
+ *   Wechaty Chatbot SDK - https://github.com/wechaty/wechaty
  *
- *   @copyright 2016-2018 Huan LI <zixia@zixia.net>
+ *   @copyright 2016 Huan LI (李卓桓) <https://github.com/huan>, and
+ *                   Wechaty Contributors <https://github.com/wechaty>.
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
@@ -15,10 +16,8 @@
  *   See the License for the specific language governing permissions and
  *   limitations under the License.
  *
- *   @ignore
  */
 import { instanceToClass }  from 'clone-class'
-import { FileBox }          from 'file-box'
 
 import {
   ContactGender,
@@ -31,9 +30,11 @@ import {
   Accessory,
 }                   from '../accessory'
 import {
+  FileBox,
+  Raven,
+
   log,
   qrCodeForChatie,
-  Raven,
 }                   from '../config'
 import {
   Sayable,
@@ -55,15 +56,14 @@ export const POOL = Symbol('pool')
  */
 export class Contact extends Accessory implements Sayable {
 
-  // tslint:disable-next-line:variable-name
   public static Type   = ContactType
-  // tslint:disable-next-line:variable-name
   public static Gender = ContactGender
 
   protected static [POOL]: Map<string, Contact>
   protected static get pool () {
     return this[POOL]
   }
+
   protected static set pool (newPool: Map<string, Contact>) {
     if (this === Contact) {
       throw new Error(
@@ -100,7 +100,7 @@ export class Contact extends Accessory implements Sayable {
     }
     if (this === Contact) {
       throw new Error(
-        'The lgobal Contact class can not be used directly!'
+        'The global Contact class can not be used directly!'
         + 'See: https://github.com/wechaty/wechaty/issues/1217',
       )
     }
@@ -203,7 +203,7 @@ export class Contact extends Accessory implements Sayable {
    * const bot = new Wechaty()
    * await bot.start()
    * const contactList = await bot.Contact.findAll()                      // get the contact list of the bot
-   * const contactList = await bot.Contact.findAll({ name: 'ruirui' })    // find allof the contacts whose name is 'ruirui'
+   * const contactList = await bot.Contact.findAll({ name: 'ruirui' })    // find all of the contacts whose name is 'ruirui'
    * const contactList = await bot.Contact.findAll({ alias: 'lijiarui' }) // find all of the contacts whose alias is 'lijiarui'
    */
   public static async findAll<T extends typeof Contact> (
@@ -290,18 +290,17 @@ export class Contact extends Accessory implements Sayable {
     super()
     log.silly('Contact', `constructor(${id})`)
 
-    // tslint:disable-next-line:variable-name
     const MyClass = instanceToClass(this, Contact)
 
     if (MyClass === Contact) {
       throw new Error(
-        'Contact class can not be instanciated directly!'
+        'Contact class can not be instantiated directly!'
         + 'See: https://github.com/wechaty/wechaty/issues/1217',
       )
     }
 
     if (!this.puppet) {
-      throw new Error('Contact class can not be instanciated without a puppet!')
+      throw new Error('Contact class can not be instantiated without a puppet!')
     }
   }
 
@@ -321,11 +320,12 @@ export class Contact extends Accessory implements Sayable {
     return `Contact<${identity}>`
   }
 
-  public async say (text:     string)      : Promise<void | Message>
-  public async say (contact:  Contact)     : Promise<void | Message>
-  public async say (file:     FileBox)     : Promise<void | Message>
-  public async say (mini:     MiniProgram) : Promise<void | Message>
-  public async say (url:      UrlLink)     : Promise<void | Message>
+  public say (text:     string)      : Promise<void | Message>
+  public say (message:  Message)     : Promise<void | Message>
+  public say (contact:  Contact)     : Promise<void | Message>
+  public say (file:     FileBox)     : Promise<void | Message>
+  public say (mini:     MiniProgram) : Promise<void | Message>
+  public say (url:      UrlLink)     : Promise<void | Message>
 
   /**
    * > Tips:
@@ -347,8 +347,8 @@ export class Contact extends Accessory implements Sayable {
    *
    * // 2. send media file to contact
    *
-   * import { FileBox }  from 'file-box'
-   * const fileBox1 = FileBox.fromUrl('https://chatie.io/wechaty/images/bot-qr-code.png')
+   * import { FileBox }  from 'wechaty'
+   * const fileBox1 = FileBox.fromUrl('https://wechaty.github.io/wechaty/images/bot-qr-code.png')
    * const fileBox2 = FileBox.fromFile('/tmp/text.txt')
    * await contact.say(fileBox1)
    * const msg1 = await contact.say(fileBox1) // only supported by puppet-padplus
@@ -386,48 +386,59 @@ export class Contact extends Accessory implements Sayable {
    */
   public async say (
     something:  string
+              | Message
               | Contact
               | FileBox
               | MiniProgram
               | UrlLink
   ): Promise<void | Message> {
     log.verbose('Contact', 'say(%s)', something)
+
+    if (something instanceof Message) {
+      return something.forward(this)
+    }
+
     let msgId: string | void
     if (typeof something === 'string') {
       /**
        * 1. Text
        */
-      msgId = await this.puppet.messageSendText({
-        contactId: this.id,
-      }, something)
+      msgId = await this.puppet.messageSendText(
+        this.id,
+        something,
+      )
     } else if (something instanceof Contact) {
       /**
        * 2. Contact
        */
-      msgId = await this.puppet.messageSendContact({
-        contactId: this.id,
-      }, something.id)
+      msgId = await this.puppet.messageSendContact(
+        this.id,
+        something.id,
+      )
     } else if (something instanceof FileBox) {
       /**
        * 3. File
        */
-      msgId = await this.puppet.messageSendFile({
-        contactId: this.id,
-      }, something)
+      msgId = await this.puppet.messageSendFile(
+        this.id,
+        something,
+      )
     } else if (something instanceof UrlLink) {
       /**
        * 4. Link Message
        */
-      msgId = await this.puppet.messageSendUrl({
-        contactId : this.id,
-      }, something.payload)
+      msgId = await this.puppet.messageSendUrl(
+        this.id,
+        something.payload,
+      )
     } else if (something instanceof MiniProgram) {
       /**
        * 5. Mini Program
        */
-      msgId = await this.puppet.messageSendMiniProgram({
-        contactId : this.id,
-      }, something.payload)
+      msgId = await this.puppet.messageSendMiniProgram(
+        this.id,
+        something.payload,
+      )
     } else {
       throw new Error('unsupported arg: ' + something)
     }
@@ -558,7 +569,7 @@ export class Contact extends Accessory implements Sayable {
    */
   /**
    * @description
-   * Check if it's a offical account, should use {@link Contact#type} instead
+   * Check if it's a official account, should use {@link Contact#type} instead
    * @deprecated
    * @ignore
    */
@@ -714,7 +725,7 @@ export class Contact extends Accessory implements Sayable {
   }
 
   /**
-   * Force reload data for Contact, Sync data from lowlevel API again.
+   * Force reload data for Contact, Sync data from low-level API again.
    *
    * @returns {Promise<this>}
    * @example
@@ -728,14 +739,14 @@ export class Contact extends Accessory implements Sayable {
    * `ready()` is For FrameWork ONLY!
    *
    * Please not to use `ready()` at the user land.
-   * If you want to sync data, uyse `sync()` instead.
+   * If you want to sync data, use `sync()` instead.
    *
    * @ignore
    */
   public async ready (
     forceSync = false,
   ): Promise<void> {
-    log.silly('Contact', 'ready() @ %s', this.puppet)
+    log.silly('Contact', 'ready() @ %s with id="%s"', this.puppet, this.id)
 
     if (!forceSync && this.isReady()) { // already ready
       log.silly('Contact', 'ready() isReady() true')
@@ -750,8 +761,8 @@ export class Contact extends Accessory implements Sayable {
       // log.silly('Contact', `ready() this.puppet.contactPayload(%s) resolved`, this)
 
     } catch (e) {
-      log.verbose('Contact', `ready() this.puppet.contactPayload(%s) exception: %s`,
-        this,
+      log.verbose('Contact', 'ready() this.puppet.contactPayload(%s) exception: %s',
+        this.id,
         e.message,
       )
       Raven.captureException(e)

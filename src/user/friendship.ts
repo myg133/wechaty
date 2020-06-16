@@ -1,7 +1,8 @@
 /**
- *   Wechaty - https://github.com/wechaty/wechaty
+ *   Wechaty Chatbot SDK - https://github.com/wechaty/wechaty
  *
- *   @copyright 2016-2018 Huan LI <zixia@zixia.net>
+ *   @copyright 2016 Huan LI (李卓桓) <https://github.com/huan>, and
+ *                   Wechaty Contributors <https://github.com/wechaty>.
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
@@ -14,7 +15,6 @@
  *   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *   See the License for the specific language governing permissions and
  *   limitations under the License.
- *   @ignore
  *
  */
 
@@ -57,7 +57,6 @@ import {
  */
 export class Friendship extends Accessory implements Acceptable {
 
-  // tslint:disable-next-line:variable-name
   public static Type = FriendshipType
 
   /**
@@ -169,7 +168,6 @@ export class Friendship extends Accessory implements Acceptable {
     super()
     log.verbose('Friendship', 'constructor(id=%s)', id)
 
-    // tslint:disable-next-line:variable-name
     const MyClass = instanceToClass(this, Friendship)
 
     if (MyClass === Friendship) {
@@ -213,6 +211,8 @@ export class Friendship extends Accessory implements Acceptable {
     if (!this.payload) {
       throw new Error('no payload')
     }
+
+    await this.contact().ready()
   }
 
   /**
@@ -355,6 +355,65 @@ export class Friendship extends Accessory implements Acceptable {
     return this.payload
       ? this.payload.type
       : FriendshipType.Unknown
+  }
+
+  /**
+   * get friendShipPayload Json
+   * @returns {FriendshipPayload}
+   *
+   * @example
+   * const bot = new Wechaty()
+   * bot.on('friendship', async friendship => {
+   *   try {
+   *     // JSON.stringify(friendship) as well.
+   *     const payload = await friendship.toJSON()
+   *   } catch (e) {
+   *     console.error(e)
+   *   }
+   * }
+   * .start()
+   */
+  public toJSON (): string {
+    log.verbose('Friendship', 'toJSON()')
+
+    if (!this.isReady()) {
+      throw new Error(`Friendship<${this.id}> needs to be ready. Please call ready() before toJSON()`)
+    }
+    return JSON.stringify(this.payload)
+  }
+
+  /**
+   * create friendShip by friendshipJson
+   * @example
+   * const bot = new Wechaty()
+   * bot.start()
+   *
+   * const payload = '{...}'  // your saved JSON payload
+   * const friendship = bot.FriendShip.fromJSON(friendshipFromDisk)
+   * await friendship.accept()
+   */
+  public static async fromJSON (
+    payload: string | FriendshipPayload,
+  ): Promise<Friendship> {
+    log.verbose('Friendship', 'static fromJSON(%s)',
+      typeof payload === 'string'
+        ? payload
+        : JSON.stringify(payload),
+    )
+
+    if (typeof payload === 'string') {
+      payload = JSON.parse(payload) as FriendshipPayload
+    }
+
+    /**
+     * Set the payload back to the puppet for future use
+     */
+    await this.puppet.friendshipPayload(payload.id, payload)
+
+    const instance = this.wechaty.Friendship.load(payload.id)
+    await instance.ready()
+
+    return instance
   }
 
 }

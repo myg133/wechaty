@@ -1,7 +1,8 @@
 /**
- *   Wechaty - https://github.com/wechaty/wechaty
+ *   Wechaty Chatbot SDK - https://github.com/wechaty/wechaty
  *
- *   @copyright 2016-2018 Huan LI <zixia@zixia.net>
+ *   @copyright 2016 Huan LI (李卓桓) <https://github.com/huan>, and
+ *                   Wechaty Contributors <https://github.com/wechaty>.
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
@@ -18,12 +19,12 @@
  */
 import {
   Contact,
+  FileBox,
   Message,
   ScanStatus,
   Wechaty,
 }               from '../src/' // from 'wechaty'
 
-import { FileBox }  from 'file-box'
 import { generate } from 'qrcode-terminal'
 
 /**
@@ -72,16 +73,20 @@ bot.start()
  *
  */
 function onScan (qrcode: string, status: ScanStatus) {
-  generate(qrcode)
+  if (status === ScanStatus.Waiting || status === ScanStatus.Timeout) {
+    generate(qrcode)
 
-  // Generate a QR Code online via
-  // http://goqr.me/api/doc/create-qr-code/
-  const qrcodeImageUrl = [
-    'https://api.qrserver.com/v1/create-qr-code/?data=',
-    encodeURIComponent(qrcode),
-  ].join('')
+    // Generate a QR Code online via
+    // http://goqr.me/api/doc/create-qr-code/
+    const qrcodeImageUrl = [
+      'https://api.qrserver.com/v1/create-qr-code/?data=',
+      encodeURIComponent(qrcode),
+    ].join('')
 
-  console.info('%s(%s) - %s', ScanStatus[status], status, qrcodeImageUrl)
+    console.info('onScan: %s(%s) - %s', ScanStatus[status], status, qrcodeImageUrl)
+  } else {
+    console.info('onScan: %s(%s)', ScanStatus[status], status)
+  }
 
   // console.info(`[${ScanStatus[status]}(${status})] ${qrcodeImageUrl}\nScan QR Code above to log in: `)
 }
@@ -113,6 +118,11 @@ function onError (e: Error) {
 async function onMessage (msg: Message) {
   console.info(msg.toString())
 
+  if (msg.self()) {
+    console.info('Message discarded because its outgoing')
+    return
+  }
+
   if (msg.age() > 2 * 60) {
     console.info('Message discarded because its TOO OLD(than 2 minutes)')
     return
@@ -120,7 +130,6 @@ async function onMessage (msg: Message) {
 
   if (msg.type() !== bot.Message.Type.Text
     || !/^(ding|ping|bing|code)$/i.test(msg.text())
-    /* && !msg.self() */
   ) {
     console.info('Message discarded because it does not match ding/ping/bing/code')
     return
@@ -135,7 +144,7 @@ async function onMessage (msg: Message) {
   /**
    * 2. reply image(qrcode image)
    */
-  const fileBox = FileBox.fromUrl('https://chatie.io/wechaty/images/bot-qr-code.png')
+  const fileBox = FileBox.fromUrl('https://wechaty.github.io/wechaty/images/bot-qr-code.png')
 
   await msg.say(fileBox)
   console.info('REPLY: %s', fileBox.toString())

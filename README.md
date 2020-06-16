@@ -1,25 +1,23 @@
-# Wechaty
+# Wechaty [![NPM Version](https://img.shields.io/npm/v/wechaty?color=brightgreen)](https://www.npmjs.com/package/wechaty) [![NPM](https://github.com/wechaty/wechaty/workflows/NPM/badge.svg)](https://github.com/wechaty/wechaty/actions?query=workflow%3ANPM) [![Docker](https://github.com/wechaty/wechaty/workflows/Docker/badge.svg)](https://github.com/wechaty/wechaty/actions?query=workflow%3ADocker)
 
-[![Wechaty](https://wechaty.github.io/wechaty/images/wechaty-logo-en.png)](https://github.com/wechaty/wechaty)
+[![Wechaty](https://wechaty.github.io/wechaty/images/wechaty-logo-green-en.png)](https://github.com/wechaty/wechaty)
 
-[![NPM Version](https://badge.fury.io/js/wechaty.svg)](https://www.npmjs.com/package/wechaty)
 [![Downloads](https://img.shields.io/npm/dm/wechaty.svg?style=flat-square)](https://www.npmjs.com/package/wechaty)
 [![GitHub stars](https://img.shields.io/github/stars/wechaty/wechaty.svg?label=github%20stars)](https://github.com/wechaty/wechaty)
 [![Docker Pulls](https://img.shields.io/docker/pulls/zixia/wechaty.svg?maxAge=2592000)](https://hub.docker.com/r/zixia/wechaty/)
 [![TypeScript](https://img.shields.io/badge/%3C%2F%3E-TypeScript-blue.svg)](https://www.typescriptlang.org/)
-[![Greenkeeper badge](https://badges.greenkeeper.io/wechaty/wechaty.svg)](https://greenkeeper.io/)
 [![Gitter](https://badges.gitter.im/Chatie/wechaty.svg)](https://gitter.im/Chatie/wechaty?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 
-## Connecting Chatbots
+## :hearts: Connecting Chatbots
 
-Wechaty is a Bot SDK for Wechat **Individual** Account which can help you create a bot in 6 lines of javascript, with cross-platform support including [Linux](https://travis-ci.com/wechaty/wechaty), [Windows](https://ci.appveyor.com/project/zixia/wechaty), [Darwin(OSX/Mac)](https://travis-ci.com/Wechaty/wechaty) and [Docker](https://app.shippable.com/github/Wechaty/wechaty).
+Wechaty is a Conversational AI RPA Chatbot SDK for Wechat **Individual** Account which can help you create a bot in 6 lines of [JavaScript](https://GitHub.com/Wechaty/wechaty), [Python](https://GitHub.com/Wechaty/python-wechaty/), [Go](https://GitHub.com/Wechaty/go-wechaty/), and [Java](https://GitHub.com/Wechaty/java-wechaty/), with cross-platform support including [Linux, Windows, MacOS](https://github.com/wechaty/wechaty/actions?query=workflow%3ANPM), and [Docker](https://github.com/wechaty/wechaty/actions?query=workflow%3ADocker).
 
 :octocat: <https://github.com/Wechaty/wechaty>  
 :beetle: <https://github.com/Wechaty/wechaty/issues>  
 :book: <https://github.com/Wechaty/wechaty/wiki>  
 :whale: <https://hub.docker.com/r/zixia/wechaty>  
 
-## Voice of Developers
+## :yum: Voice of Developers
 
 > "Wechaty is a great solution, I believe there would be much more users recognize it." [link](https://github.com/Wechaty/wechaty/pull/310#issuecomment-285574472)  
 > &mdash; <cite>@Gcaufy, Tencent Engineer, Author of [WePY](https://github.com/Tencent/wepy)</cite>
@@ -31,14 +29,17 @@ Wechaty is a Bot SDK for Wechat **Individual** Account which can help you create
 > &mdash; <cite>@Jarvis, Baidu Engineer</cite>
 >
 > "Wechaty让运营人员更多的时间思考如何进行活动策划、留存用户，商业变现" [link](http://mp.weixin.qq.com/s/dWHAj8XtiKG-1fIS5Og79g)  
-> &mdash; <cite>@lijiarui, CEO of BotOrange.</cite>
+> &mdash; <cite>@lijiarui, Founder & CEO of Juzi.BOT.</cite>
 >
 > "If you know js ... try Wechaty, it's easy to use."  
 > &mdash; <cite>@Urinx Uri Lee, Author of [WeixinBot(Python)](https://github.com/Urinx/WeixinBot)</cite>
+>
+> "Wechaty is a good project, I hope it can continue! Therefore, I became a contributors in open collective."  
+> &mdash; <cite>[@Simple](https://github.com/mrwhh)</cite>
 
 See more at [Wiki:Voice Of Developer](https://github.com/Wechaty/wechaty/wiki/Voice%20Of%20Developer)
 
-### Join Us
+### :raising_hand: Join Us
 
 Wechaty is used in many ChatBot projects by thousands of developers. If you want to talk with other developers, just scan the following QR Code in WeChat with secret code _wechaty_, join our **Wechaty Developers' Home**.
 
@@ -46,7 +47,18 @@ Wechaty is used in many ChatBot projects by thousands of developers. If you want
 
 Scan now, because other Wechaty developers want to talk with you too! (secret code: _wechaty_)
 
-## The World's Shortest ChatBot Code: 6 lines of JavaScript
+### :book: Resource
+
+Wechaty already held lots of talk and got a lot of blogs in the past 4 years, here is all of the wechaty resouces:
+
+- :video_camera: [Youtube Playlist: Watch all of talk video related with Wechaty](https://www.youtube.com/playlist?list=PL8hd9KDTdarDXf_Rxtr8meKhxtgcXMInh)
+- :page_with_curl: [Full Docs](https://wechaty.js.org/)
+- :bulb: [Blog: See how developers use wechaty building fantastic project!](https://wechaty.github.io/)
+- :beginner: [Wechaty-Getting-Started:Wechaty Starter Project Template that Works Out-of-the-Box](https://github.com/wechaty/wechaty-getting-started)
+- :tada: [Wechaty Contributor List: Thanks for their contribution!](https://github.com/wechaty/wechaty/wiki/Contributors)
+- :gift: [Juzibot Support Wechaty: Know everything about Wechaty](https://github.com/juzibot/Welcome/wiki/Everything-about-Wechaty)
+
+## :rocket: The World's Shortest ChatBot Code: 6 lines of JavaScript
 
 ```javascript
 
@@ -59,22 +71,22 @@ Wechaty.instance() // Global Instance
 .start()
 ```
 
-> **Notice: Wechaty requires Node.js version >= 10**
+> **Notice: Wechaty requires Node.js version >= 12**
 
 This bot can log all messages to the console after login by scan.
 
 You can find more examples from [Wiki](https://github.com/Wechaty/wechaty/wiki/Examples) and [Example Directory](https://github.com/Wechaty/wechaty/blob/master/examples/).
 
-## Requirements
+## :checkered_flag: Requirements
 
-1. Node.js 10 or above
-1. Global Network Connection
+1. Node.js v12
+1. `sudo apt-get install build-essential && sudo snap install shellcheck`
 
-## Getting Started
+## :triangular_flag_on_post: Getting Started
 
 [![node](https://img.shields.io/node/v/wechaty.svg?maxAge=604800)](https://nodejs.org/)
 
-* Wechaty Starter Repository - <https://github.com/wechaty/wechaty-getting-started>
+- Wechaty Starter Repository - <https://github.com/wechaty/wechaty-getting-started>
 
 We have a Wechaty starter repository for beginners with the simplest setting. It will be **just work** out-of-the-box after you `clone` & `npm install` & `npm start`.
 
@@ -84,8 +96,9 @@ Otherwise, please saved the above _The World's Shortest ChatBot Code: 6 lines of
 
 ### 1. Npm
 
-[![NPM Version](https://badge.fury.io/js/wechaty.svg)](https://www.npmjs.com/package/wechaty)
-[![npm (tag)](https://img.shields.io/npm/v/wechaty/next.svg)](https://www.npmjs.com/package/wechaty?activeTab=versions)
+[![NPM Version](https://img.shields.io/npm/v/wechaty?color=brightgreen&label=wechaty%40latest)](https://www.npmjs.com/package/wechaty)
+[![npm (tag)](https://img.shields.io/npm/v/wechaty/next?color=yellow&label=wechaty%40next)](https://www.npmjs.com/package/wechaty?activeTab=versions)
+
 [![Downloads](https://img.shields.io/npm/dm/wechaty.svg?style=flat-square)](https://www.npmjs.com/package/wechaty)
 [![install size](https://packagephobia.now.sh/badge?p=wechaty)](https://packagephobia.now.sh/result?p=wechaty)
 
@@ -103,7 +116,7 @@ node mybot.js
 [![Docker Pulls](https://img.shields.io/docker/pulls/zixia/wechaty.svg?maxAge=2592000)](https://hub.docker.com/r/zixia/wechaty/)
 [![Docker Layers](https://images.microbadger.com/badges/image/zixia/wechaty.svg)](https://microbadger.com/#/images/zixia/wechaty)
 
-* Wechaty Starter Repository for Docker - <https://github.com/wechaty/docker-wechaty-getting-started>
+- Wechaty Starter Repository for Docker - <https://github.com/wechaty/docker-wechaty-getting-started>
 
 > Wechaty Docker supports both JavaScript and TypeScript. To use TypeScript just write in TypeScript and save with extension name `.ts`, no need to compile because we use `ts-node` to run it.
 
@@ -146,7 +159,7 @@ Learn more about Wechaty Puppet from the Puppet Wiki:
 1. Puppet Directory: <https://github.com/Wechaty/wechaty-puppet/wiki/Directory>
 1. Puppet Compatibility: <https://github.com/Wechaty/wechaty-puppet/wiki/Compatibility>
 
-## API
+## :guitar: API
 
 Read the Full Documentation at [Wechaty Official API Reference](https://wechaty.github.io/wechaty/)
 
@@ -156,15 +169,15 @@ Main bot class.
 
 A `Bot` is a Wechaty instance that control a specific [wechaty-puppet](https://github.com/Wechaty/wechaty/wiki/Puppet).
 
-* `new Wechaty(options?: WechatyOptions)`
+- `new Wechaty(options?: WechatyOptions)`
     1. `options.name?: string` the name of this bot(optional)
-    2. `optoins.puppet?: string` select which puppet provider we want to use. must be one of the:
+    2. `options.puppet?: string` select which puppet provider we want to use. must be one of the:
         1. [wechaty-puppet-puppeteer](https://github.com/Wechaty/wechaty-puppet-puppeteer) - Angular Hook for Web Wechat <- This is the DEFAULT
         2. [wechaty-puppet-wechat4u](https://github.com/Wechaty/wechaty-puppet-wechat4u) - HTTP API for Web Wechat
         3. [wechaty-puppet-padpro](https://github.com/botorange/wechaty-puppet-padpro) - iPad App Protocol
         4. [wechaty-puppet-ioscat](https://github.com/linyimin-bupt/wechaty-puppet-ioscat) - iPhone App Hook
         5. [wechaty-puppet-mock](https://github.com/Wechaty/wechaty-puppet-mock) - Mock for Testing
-    3. `optoins.puppetOptions?: PuppetOptions` options for the puppet provider.
+    3. `options.puppetOptions?: PuppetOptions` options for the puppet provider.
 
 | Wechaty | API | Description |
 | :--- | :--- | :---        |
@@ -195,7 +208,7 @@ All wechat contacts(friends/non-friends) will be encapsulated as a Contact.
 | static | [`load(query: string): Contact`](https://wechaty.github.io/wechaty/#Contact.load) | get contact by id |
 | property | `id: readonly string` | get contact id |
 | method | [`sync(): Promise<void>`](https://wechaty.github.io/wechaty/#Contact+sync) | force reload data for contact , sync data from lowlevel API again|
-| method | [`say(text: string): Promise<void | Message>`](https://wechaty.github.io/wechaty/#Contact+say) | send text, Contact, or file to contact, return the message which the bot sent (only `puppet-padplus` supported). |
+| method | [`say(text: string): Promise<void \| Message>`](https://wechaty.github.io/wechaty/#Contact+say) | send text, Contact, or file to contact, return the message which the bot sent (only `puppet-padplus` supported). |
 | method | [`self(): boolean`](https://wechaty.github.io/wechaty/#Contact+self) | check if contact is self |
 | method | [`name(): string`](https://wechaty.github.io/wechaty/#Contact+name) | get the name from a contact |
 | method | [`alias(): Promise<string>`](https://wechaty.github.io/wechaty/#Contact+alias) | get the alias for a contact |
@@ -241,14 +254,14 @@ All wechat messages will be encapsulated as a Message.
 | method | [`to(): Contact`](https://wechaty.github.io/wechaty/#Message+to) | get the destination of the message |
 | method | [`room(): null \| Room`](https://wechaty.github.io/wechaty/#Message+room) | get the room from the message.(If the message is not in a room, then will return `null`) |
 | method | [`text(): string`](https://wechaty.github.io/wechaty/#Message+text) | get the text content of the message |
-| method | [`say(text: string): Promise<void | Message>`](https://wechaty.github.io/wechaty/#Message+say) | reply a Text, Media File , or contact message to the sender, return the message which the bot sent (only `puppet-padplus` supported). |
+| method | [`say(text: string): Promise<void \| Message>`](https://wechaty.github.io/wechaty/#Message+say) | reply a Text, Media File , or contact message to the sender, return the message which the bot sent (only `puppet-padplus` supported). |
 | method | [`type(): MessageType`](https://wechaty.github.io/wechaty/#Message+type) | get the type from the message |
 | method | [`self(): boolean`](https://wechaty.github.io/wechaty/#Message+self) | check if a message is sent by self |
 | method | [`mention(): Contact[]`](https://wechaty.github.io/wechaty/#Message+mention) | get message mentioned contactList. |
 | method | [`mentionSelf(): boolean`](https://wechaty.github.io/wechaty/#Message+mentionSelf) | check if a message is mention self |
 | method | [`forward(to: Contact): Promise<void>`](https://wechaty.github.io/wechaty/#Message+forward) | Forward the received message |
 | method | [`age(): number`](https://wechaty.github.io/wechaty/#Message+age) | the number of seconds since it has been created |
-| method | `date(): Date` | the time it was created |
+| method | [`date(): Date`](https://wechaty.github.io/wechaty/#Message+date) | the time it was created |
 | method | [`toFileBox(): Promise<FileBox>`](https://wechaty.github.io/wechaty/#Message+toFileBox) | extract the Media File from the Message, and put it into the FileBox. |
 | method | [`toContact(): Promise<Contact>`](https://wechaty.github.io/wechaty/#Message+toContact) | get Share Card of the Message |
 
@@ -294,16 +307,12 @@ Accept room invitation
 | method | [`inviter(): Contact`](https://wechaty.github.io/wechaty/#RoomInvitation+inviter) | get the inviter from room invitation |
 | method | [`roomTopic(): Promise<string>`](https://wechaty.github.io/wechaty/#RoomInvitation+inviter) | get the room topic from room invitation |
 | method | [`date(): Promise<Date>`](https://wechaty.github.io/wechaty/#RoomInvitation+date) | the time it was created |
-| method | `age(): Promise<number>` | the number of seconds since it has been created |
+| method | [`age(): Promise<number>`](https://wechaty.github.io/wechaty/#RoomInvitation+age) | the number of seconds since it has been created |
 
-## TEST
+## :eyeglasses: TEST
 
-[![Ubuntu Linux/Mac Build Status](https://travis-ci.com/Wechaty/wechaty.svg?branch=master)](https://travis-ci.com/Wechaty/wechaty)
-[![Travis](https://img.shields.io/travis/Wechaty/wechaty.svg?label=Ubuntu/OSX)](https://travis-ci.com/Wechaty/wechaty)
-[![CentOS Linux Build Status](https://circleci.com/gh/Wechaty/wechaty.svg?style=svg)](https://circleci.com/gh/Wechaty/wechaty)
-[![Windows Build Status](https://img.shields.io/appveyor/ci/zixia/wechaty/master.svg?label=Windows)](https://ci.appveyor.com/project/zixia/wechaty)
-[![Docker Build Status](https://img.shields.io/shippable/5aaf8667ec373f17004dcb66.svg?label=Docker&color=brightgreen)](https://app.shippable.com/github/Wechaty/wechaty)
-
+[![NPM](https://github.com/wechaty/wechaty/workflows/NPM/badge.svg)](https://github.com/wechaty/wechaty/actions?query=workflow%3ANPM)
+[![Docker](https://github.com/wechaty/wechaty/workflows/Docker/badge.svg)](https://github.com/wechaty/wechaty/actions?query=workflow%3ADocker)
 [![Coverage Status](https://coveralls.io/repos/github/Wechaty/wechaty/badge.svg?branch=master)](https://coveralls.io/github/Wechaty/wechaty?branch=master)
 [![Known Vulnerabilities](https://snyk.io/test/github/Wechaty/wechaty/badge.svg)](https://snyk.io/test/github/Wechaty/wechaty)
 
@@ -317,28 +326,28 @@ npm test
 
 Get to know more about the tests from [Wiki:Tests](https://github.com/Wechaty/wechaty/wiki/Tests)
 
-## RELEASE NOTES
+## :pencil: RELEASE NOTES
 
-* [Latest Release](https://github.com/Wechaty/wechaty/releases/latest)(All releases [here](https://github.com/Wechaty/wechaty/releases))
-* [Changelog](https://github.com/Wechaty/wechaty/blob/master/CHANGELOG.md)
+- [Latest Release](https://github.com/Wechaty/wechaty/releases/latest)(All releases [here](https://github.com/Wechaty/wechaty/releases))
+- [Changelog](https://github.com/Wechaty/wechaty/blob/master/CHANGELOG.md)
 
-### Views Since Feb 15, 2019
+### :saxophone: Views Since Feb 15, 2019
 
 [![HitCount](http://hits.dwyl.io/wechaty/wechaty.svg)](http://hits.dwyl.io/wechaty/wechaty)
 
-## POWERED BY WECHATY
+## :sparkling_heart: POWERED BY WECHATY
 
-[![Powered by Wechaty](https://img.shields.io/badge/Powered%20By-Wechaty-blue.svg)](https://github.com/Wechaty/wechaty)
+[![Powered by Wechaty](https://img.shields.io/badge/Powered%20By-Wechaty-brightgreen.svg)](https://github.com/Wechaty/wechaty)
 
-### Wechaty Badge
+### :sparkles: Wechaty Badge
 
 ```markdown
-[![Powered by Wechaty](https://img.shields.io/badge/Powered%20By-Wechaty-blue.svg)](https://github.com/Wechaty/wechaty)
+[![Powered by Wechaty](https://img.shields.io/badge/Powered%20By-Wechaty-brightgreen.svg)](https://github.com/Wechaty/wechaty)
 ```
 
 Get more embed html/markdown code from [Wiki:PoweredByWechaty](https://github.com/Wechaty/wechaty/wiki/PoweredByWechaty)
 
-### Projects Using Wechaty
+### :star2: Projects Using Wechaty
 
 1. [一个用CNN深度神经网络给图片评分的wechaty项目](https://github.com/huyingxi/wechaty_selfie)
 2. [Relay between Telegram and WeChat](https://github.com/Firaenix/TeleChatRelay)
@@ -353,7 +362,7 @@ Pull Request is welcome to add yours!
 
 Learn more about Projects Using Wechaty at [Wiki:PoweredByWechaty](https://github.com/Wechaty/wechaty/wiki/PoweredByWechaty)
 
-## Find a Good Server
+## :innocent: Find a Good Server
 
 The best practice for running Wechaty Docker/NPM is using a VPS(Virtual Private Server) outside of China, which can save you hours of time because `npm install` and `docker pull` will run smoothly without any problem.
 
@@ -366,18 +375,18 @@ The following VPS providers are used by the Wechaty team, and they worked perfec
 | Korea     | $10   | 1GB     | Alipay, Paypal    | [Netdedi](https://www.netdedi.com/?affid=35) |
 | Singapore | $3.5  | 512MB   | Alipay, Wechat    | [Vultr](https://www.vultr.com/?ref=6986613) |
 
-## See Also
+## :notes: See Also
 
-* [RelatedProject](https://github.com/Wechaty/wechaty/wiki/RelatedProject)
+- [RelatedProject](https://github.com/Wechaty/wechaty/wiki/RelatedProject)
 
-## The Story
+## :poop: The Story
 
 In 2017 ...
 
 Huan's daily life/work depends on too much chat on wechat.
 
-* Almost 14,000 wechat friends in May 2014, before wechat restricts a total number of friends to 5,000.
-* Almost 400 wechat rooms, and most of them have more than 400 members.
+- Almost 14,000 wechat friends in May 2014, before wechat restricts a total number of friends to 5,000.
+- Almost 400 wechat rooms, and most of them have more than 400 members.
 
 Can you imagine that? He was dying...
 
@@ -385,7 +394,7 @@ So a tireless bot working for me 24x7 on wechat, monitoring/filtering the most i
 
 At last, It's built for huan's personal study purpose of Automatically Testing.
 
-## Contributors
+## :two_hearts: Contributors
 
 [![GitHub issues](https://img.shields.io/github/issues/wechaty/wechaty.svg)](https://github.com/Wechaty/wechaty/issues)
 [![GitHub pull requests](https://img.shields.io/github/issues-pr/wechaty/wechaty.svg)](https://github.com/Wechaty/wechaty/pulls)
@@ -395,7 +404,7 @@ At last, It's built for huan's personal study purpose of Automatically Testing.
 This project exists thanks to all the people who contribute. [[Contribute](CONTRIBUTING.md)].
 [![Contribute](https://opencollective.com/wechaty/contributors.svg?width=890&button=false)](https://github.com/Wechaty/wechaty/graphs/contributors)
 
-## Backers
+## :sunglasses: Backers
 
 [![Backers on Open Collective](https://opencollective.com/wechaty/backers/badge.svg)](#backers)
 
@@ -403,7 +412,7 @@ Thank you to all our backers! 🙏 [[Become a backer](https://opencollective.com
 
 [![Open Collective Wechaty](https://opencollective.com/wechaty/backers.svg?width=890)](https://opencollective.com/wechaty#backers)
 
-## Sponsors
+## :smirk: Sponsors
 
 [![Sponsors on Open Collective](https://opencollective.com/wechaty/sponsors/badge.svg)](#sponsors)
 
@@ -411,15 +420,28 @@ Support this project by becoming a sponsor. Your logo will show up here with a l
 
 [![Wechaty Sponsor](https://opencollective.com/wechaty/sponsor.svg?width=890)](https://opencollective.com/wechaty/#sponsor)
 
-## Author
+## :point_down: Multi-language Wechaty
 
-1. [Huan](https://github.com/huan) [(李卓桓)](http://linkedin.com/in/zixia) \<huan@chatie.io\>
+[![Wechaty in Python](https://img.shields.io/badge/Wechaty-Python-blue)](https://github.com/wechaty/python-wechaty)
+[![Wechaty in Kotlin](https://img.shields.io/badge/Wechaty-Kotlin-orange)](https://github.com/wechaty/java-wechaty)
+[![Wechaty in Go](https://img.shields.io/badge/Wechaty-Go-7de)](https://github.com/wechaty/go-wechaty)
+[![Wechaty in Scala](https://img.shields.io/badge/Wechaty-Scala-890)](https://github.com/wechaty/scala-wechaty)
+
+- [Wechaty](https://github.com/wechaty/wechaty) - Conversatioanl AI Chatot SDK for Wechaty Individual Accounts (TypeScript)
+- [Python Wechaty](https://github.com/wechaty/python-wechaty) - Python WeChaty Conversational AI Chatbot SDK for Wechat Individual Accounts (Python)
+- [Go Wechaty](https://github.com/wechaty/go-wechaty) - Go WeChaty Conversational AI Chatbot SDK for Wechat Individual Accounts (Go)
+- [Java Wechaty](https://github.com/wechaty/java-wechaty) - Java WeChaty Conversational AI Chatbot SDK for Wechat Individual Accounts (Java)
+- [Scala Wechaty](https://github.com/wechaty/scala-wechaty) - Scala WeChaty Conversational AI Chatbot SDK for WechatyIndividual Accounts (Scala)
+
+## :raised_hands: Authors
+
+1. [Huan](https://github.com/huan) [(李卓桓)](http://linkedin.com/in/zixia), Tencent TVP of Chatbot
 1. [Rui (李佳芮)](https://pre-angel.com/peoples/jiarui-li/)
 
 [![Profile of Huan LI (李卓桓) on StackOverflow](https://stackoverflow.com/users/flair/1123955.png)](https://stackoverflow.com/users/1123955/huan)
 
-## Copyright & License
+## :email: Copyright & License
 
-* Code & Docs © 2016-now Huan LI \<zixia@zixia.net\>
-* Code released under the Apache-2.0 License
-* Docs released under Creative Commons
+- Code & Docs © 2016 Huan, Rui, and Wechaty Contributors
+- Code released under the Apache-2.0 License
+- Docs released under Creative Commons
