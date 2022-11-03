@@ -1,5 +1,4 @@
-#!/usr/bin/env ts-node
-
+#!/usr/bin/env node
 /**
  *   Wechaty Chatbot SDK - https://github.com/wechaty/wechaty
  *
@@ -21,27 +20,33 @@
  */
 import {
   Wechaty,
+  WechatyBuilder,
   VERSION,
-}           from 'wechaty'
+}                   from 'wechaty'
+
+import * as USERS from 'wechaty/users'
+import * as IMPLS from 'wechaty/impls'
+
+import assert from 'assert'
 
 function getBotList (): Wechaty[] {
   const botList = [
-    new Wechaty({ puppet: 'wechaty-puppet-mock' }),
-    new Wechaty({ puppet: 'wechaty-puppet-wechat4u' }),
+    WechatyBuilder.build({ puppet: 'wechaty-puppet-mock' }),
+    // new Wechaty({ puppet: 'wechaty-puppet-wechat4u' }),
     // new Wechaty({ puppet: 'wechaty-puppet-puppeteer' }),
   ]
 
-  if (process.env.WECHATY_PUPPET_HOSTIE_TOKEN) {
+  if (process.env.WECHATY_PUPPET_SERVICE_TOKEN) {
     botList.push(
-      new Wechaty({
-        puppet: 'wechaty-puppet-padplus',
+      WechatyBuilder.build({
+        puppet: 'wechaty-puppet-service',
       })
     )
   }
-  if (process.env.WECHATY_PUPPET_PADPLUS_TOKEN) {
+  if (process.env.WECHATY_PUPPET_PADLOCAL_TOKEN) {
     botList.push(
-      new Wechaty({
-        puppet: 'wechaty-puppet-padplus',
+      WechatyBuilder.build({
+        puppet: 'wechaty-puppet-padlocal',
       })
     )
   }
@@ -50,18 +55,14 @@ function getBotList (): Wechaty[] {
 }
 
 async function main () {
-  if (VERSION === '0.0.0') {
-    throw new Error('VERSION not set!')
-  }
-
   const botList = getBotList()
   try {
     await Promise.all(
       botList.map(bot => bot.start()),
     )
-    botList.forEach(
-      bot => console.info(`Wechaty v${bot.version()} smoking test passed.`),
-    )
+    for (const bot of botList) {
+      console.info(`Wechaty v${bot.version()} smoking test passed.`)
+    }
   } catch (e) {
     console.error(e)
     // Error!
@@ -71,6 +72,12 @@ async function main () {
       botList.map(bot => bot.stop()),
     )
   }
+
+  const tag: USERS.Tag = {} as any as IMPLS.TagImpl
+  assert.ok(tag, 'should get valid USERS & IMPLS')
+
+  assert.notStrictEqual(VERSION,  '0.0.0', 'VERSION must be set!')
+
   return 0
 }
 

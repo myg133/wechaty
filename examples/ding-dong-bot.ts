@@ -18,23 +18,42 @@
  *
  */
 import {
-  Contact,
-  FileBox,
-  Message,
+  WechatyBuilder,
   ScanStatus,
-  Wechaty,
-}               from '../src/' // from 'wechaty'
+  Message,
+  Contact,
+}                     from '../src/mods/mod.js' // from 'wechaty'
 
-import { generate } from 'qrcode-terminal'
+import qrTerm from 'qrcode-terminal'
+import { FileBox } from 'file-box'
 
 /**
  *
  * 1. Declare your Bot!
  *
  */
-const bot = new Wechaty({
+const options = {
   name : 'ding-dong-bot',
-})
+
+  /**
+   * You can specify different puppet for different IM protocols.
+   * Learn more from https://wechaty.js.org/docs/puppet-providers/
+   */
+  // puppet: 'wechaty-puppet-whatsapp'
+
+  /**
+   * You can use wechaty puppet provider 'wechaty-puppet-service'
+   *   which can connect to Wechaty Puppet Services
+   *   for using more powerful protocol.
+   * Learn more about services (and TOKEN)from https://wechaty.js.org/docs/puppet-services/
+   */
+  // puppet: 'wechaty-puppet-service'
+  // puppetOptions: {
+  //   token: 'xxx',
+  // }
+}
+
+const bot = WechatyBuilder.build(options)
 
 /**
  *
@@ -47,13 +66,12 @@ bot
   .on('scan',   onScan)
   .on('error',  onError)
   .on('message', onMessage)
-
 /**
  *
  * 3. Start the bot!
  *
  */
-bot.start()
+  .start()
   .catch(async e => {
     console.error('Bot start() fail:', e)
     await bot.stop()
@@ -74,12 +92,10 @@ bot.start()
  */
 function onScan (qrcode: string, status: ScanStatus) {
   if (status === ScanStatus.Waiting || status === ScanStatus.Timeout) {
-    generate(qrcode)
+    qrTerm.generate(qrcode)
 
-    // Generate a QR Code online via
-    // http://goqr.me/api/doc/create-qr-code/
     const qrcodeImageUrl = [
-      'https://api.qrserver.com/v1/create-qr-code/?data=',
+      'https://wechaty.js.org/qrcode/',
       encodeURIComponent(qrcode),
     ].join('')
 
@@ -93,17 +109,16 @@ function onScan (qrcode: string, status: ScanStatus) {
 
 function onLogin (user: Contact) {
   console.info(`${user.name()} login`)
-  bot.say('Wechaty login').catch(console.error)
 }
 
 function onLogout (user: Contact) {
-  console.info(`${user.name()} logouted`)
+  console.info(`${user.name()} logged out`)
 }
 
 function onError (e: Error) {
   console.error('Bot error:', e)
   /*
-  if (bot.logonoff()) {
+  if (bot.isLoggedIn) {
     bot.say('Wechaty error: ' + e.message).catch(console.error)
   }
   */
@@ -174,7 +189,7 @@ const welcome = `
 
 =============== Powered by Wechaty ===============
 -------- https://github.com/wechaty/wechaty --------
-          Version: ${bot.version(true)}
+          Version: ${bot.version()}
 
 I'm a bot, my superpower is talk in Wechat.
 

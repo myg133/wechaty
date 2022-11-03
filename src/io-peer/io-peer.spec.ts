@@ -1,5 +1,4 @@
-#!/usr/bin/env ts-node
-
+#!/usr/bin/env -S node --no-warnings --loader ts-node/esm
 /**
  *   Wechaty Chatbot SDK - https://github.com/wechaty/wechaty
  *
@@ -19,27 +18,29 @@
  *   limitations under the License.
  *
  */
-import test  from 'blue-tape'
+import { test }  from 'tstest'
 
-import Peer, {
-  format,
-  parse,
-  JsonRpcPayloadResponse,
-}                           from 'json-rpc-peer'
+import jsonRpcPeer from 'json-rpc-peer'
 
 import {
   getPeer,
-}                   from './io-peer'
+}                   from './io-peer.js'
 
 test('getPeer()', async t => {
   const EXPECTED_PORT = 8788
   const server = getPeer({
-    hostieGrpcPort: EXPECTED_PORT,
+    serviceGrpcPort: EXPECTED_PORT,
   })
-  const client = new Peer()
+  const client = new jsonRpcPeer.Peer()
+  /**
+   * FIXME: Huan(202108): remove `any` to fix the typing
+   */
+  server.pipe(client as any).pipe(server)
 
-  server.pipe(client).pipe(server)
-
+  /**
+   * Huan(202101) Need to be fixed by new IO Bus system.
+   *  See: https://github.com/wechaty/wechaty-puppet-service/issues/118
+   */
   const port = await client.request('getHostieGrpcPort')
   t.equal(port, EXPECTED_PORT, 'should get the right port')
 })
@@ -47,13 +48,17 @@ test('getPeer()', async t => {
 test('exec()', async t => {
   const EXPECTED_PORT = 8788
   const server = getPeer({
-    hostieGrpcPort: EXPECTED_PORT,
+    serviceGrpcPort: EXPECTED_PORT,
   })
 
-  const request = format.request(42, 'getHostieGrpcPort')
+  /**
+   * Huan(202101) Need to be fixed by new IO Bus system.
+   *  See: https://github.com/wechaty/wechaty-puppet-service/issues/118
+   */
+  const request = jsonRpcPeer.format.request(42, 'getHostieGrpcPort')
   const response = await server.exec(request) as string
   // console.info('response: ', response)
 
-  const obj = parse(response) as JsonRpcPayloadResponse
+  const obj = jsonRpcPeer.parse(response) as jsonRpcPeer.JsonRpcPayloadResponse
   t.equal(obj.result, EXPECTED_PORT, 'should get the right port from payload')
 })

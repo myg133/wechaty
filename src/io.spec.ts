@@ -1,5 +1,4 @@
-#!/usr/bin/env ts-node
-
+#!/usr/bin/env -S node --no-warnings --loader ts-node/esm
 /**
  *   Wechaty Chatbot SDK - https://github.com/wechaty/wechaty
  *
@@ -19,17 +18,17 @@
  *   limitations under the License.
  *
  */
-import test  from 'blue-tape'
+import { test }  from 'tstest'
+import { WechatyBuilder } from './wechaty-builder.js'
 
-import { Io }       from './io'
-import { Wechaty }  from './wechaty'
+import { Io }       from './io.js'
 
 test('Io restart without problem', async t => {
   const io = new Io({
     // token must not contain any white spaces
-    hostiePort: 8788,
-    token   : 'mock_token_in_wechaty/wechaty/src/io.spec.ts',
-    wechaty : new Wechaty(),
+    servicePort : 8788,
+    token       : 'mock_00000000-0000-0000-0000-000000000000',
+    wechaty     : WechatyBuilder.build(),
   })
 
   try {
@@ -40,6 +39,6 @@ test('Io restart without problem', async t => {
     }
     t.pass('start/restart successed.')
   } catch (e) {
-    t.fail(e)
+    t.fail(e as any)
   }
 })

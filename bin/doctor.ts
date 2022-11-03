@@ -21,11 +21,11 @@
 
 import os from 'os'
 
-import { config }   from '../src/config'
-import { Doctor }   from '../src/doctor'
-import { Wechaty }  from '../src/wechaty'
+import { config }   from '../src/config.js'
+import { Doctor }   from '../src/doctor.js'
+import { WechatyBuilder }  from '../src/wechaty-builder.js'
 
-const wechaty = Wechaty.instance()
+const wechaty = WechatyBuilder.singleton()
 const doctor = new Doctor()
 
 async function main () {

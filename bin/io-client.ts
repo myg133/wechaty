@@ -1,4 +1,4 @@
-#!/usr/bin/env node
+#!/usr/bin/env -S node --no-warnings --loader ts-node/esm
 /**
  *   Wechaty Chatbot SDK - https://github.com/wechaty/wechaty
  *
@@ -19,16 +19,20 @@
  *
  */
 
+import 'dotenv/config.js'
+
+import {
+  log,
+}             from 'wechaty-puppet'
 import {
   config,
-  log,
-}               from '../src/config'
+}             from '../src/config.js'
 
 import {
   IoClient,
   IoClientOptions,
-}                   from '../src/io-client'
-import { Wechaty }  from '../src/wechaty'
+}                   from '../src/io-client.js'
+import { WechatyBuilder }  from '../src/wechaty-builder.js'
 
 const welcome = `
 | __        __        _           _
@@ -57,10 +61,12 @@ async function main () {
   console.info(welcome)
   log.info('Client', 'Starting for WECHATY_TOKEN: %s', token)
 
-  const wechaty = new Wechaty({ name: token })
+  const wechaty = WechatyBuilder.build({ name: token })
 
-  const WECHATY_HOSTIE_PORT = 'WECHATY_HOSTIE_PORT'
-  const port = parseInt(process.env[WECHATY_HOSTIE_PORT] || '0')
+  let port
+  if (process.env['WECHATY_PUPPET_SERVER_PORT']) {
+    port = parseInt(process.env['WECHATY_PUPPET_SERVER_PORT'])
+  }
 
   const options: IoClientOptions = {
     token,

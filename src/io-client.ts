@@ -17,28 +17,23 @@
  *   limitations under the License.
  *
  */
-/**
- * DO NOT use `require('../')` here!
- * because it will casue a LOOP require ERROR
- */
-import { StateSwitch }  from 'state-switch'
-
+import { StateSwitch } from 'state-switch'
 import {
   PuppetServer,
   PuppetServerOptions,
-}                       from 'wechaty-puppet-hostie'
+}                       from 'wechaty-puppet-service'
 
-import { Message }      from './user'
+import type { MessageInterface }  from './user-modules/mod.js'
+import type { WechatyInterface }  from './wechaty/mod.js'
 
 import {
   log,
-}                      from './config'
-import { Io }           from './io'
-import { Wechaty }      from './wechaty'
+}                       from './config.js'
+import { Io }           from './io.js'
 
 export interface IoClientOptions {
   token   : string,
-  wechaty : Wechaty,
+  wechaty : WechatyInterface,
   port?: number
 }
 
@@ -67,7 +62,7 @@ export class IoClient {
         .map(key => {
           return `${key}:${(options as any)[key]}`
         })
-        .reduce((acc, cur) => `${acc}, ${cur}`)
+        .reduce((acc, cur) => `${acc}, ${cur}`),
     )
 
     const normalizedOptions = {
@@ -80,27 +75,33 @@ export class IoClient {
     this.state = new StateSwitch('IoClient', { log })
   }
 
-  private async startHostie () {
-    log.verbose('IoClient', 'startHostie()')
+  private async startPuppetServer () {
+    log.verbose('IoClient', 'startPuppetServer()')
 
     if (this.puppetServer) {
-      throw new Error('hostie server exists')
+      throw new Error('puppet server exists')
     }
 
     const options: PuppetServerOptions = {
       endpoint : '0.0.0.0:' + this.options.port,
-      puppet   : this.options.wechaty.puppet,
+      /**
+       * Huan(202110): FIXME: remove the any
+       *  by updating the puppet-service server code
+       *  to use PuppetInterface
+       */
+      puppet   : this.options.wechaty.puppet as any,
       token    : this.options.token,
     }
     this.puppetServer = new PuppetServer(options)
     await this.puppetServer.start()
   }
 
-  private async stopHostie () {
-    log.verbose('IoClient', 'stopHostie()')
+  private async stopPuppetServer () {
+    log.verbose('IoClient', 'stopPuppetServer()')
 
     if (!this.puppetServer) {
-      throw new Error('hostie server does not exist')
+      log.error('IoClient', 'stopPuppetServer() this.puppetServer is `undefined`')
+      return
     }
 
     await this.puppetServer.stop()
@@ -110,13 +111,13 @@ export class IoClient {
   public async start (): Promise<void> {
     log.verbose('IoClient', 'start()')
 
-    if (this.state.on()) {
+    if (this.state.active()) {
       log.warn('IoClient', 'start() with a on state, wait and return')
-      await this.state.ready('on')
+      await this.state.stable('active')
       return
     }
 
-    this.state.on('pending')
+    this.state.active('pending')
 
     try {
       await this.hookWechaty(this.options.wechaty)
@@ -125,37 +126,42 @@ export class IoClient {
 
       await this.options.wechaty.start()
 
-      await this.startHostie()
+      await this.startPuppetServer()
 
-      this.state.on(true)
+      this.state.active(true)
 
     } catch (e) {
-      log.error('IoClient', 'start() exception: %s', e.message)
-      this.state.off(true)
+      log.error('IoClient', 'start() exception: %s', (e as Error).message)
+      this.state.inactive(true)
       throw e
     }
   }
 
-  private async hookWechaty (wechaty: Wechaty): Promise<void> {
-    log.verbose('IoClient', 'initWechaty()')
+  private async hookWechaty (wechaty: WechatyInterface): Promise<void> {
+    log.verbose('IoClient', 'hookWechaty()')
 
-    if (this.state.off()) {
+    if (this.state.inactive()) {
       const e = new Error('state.off() is true, skipped')
       log.warn('IoClient', 'initWechaty() %s', e.message)
       throw e
     }
 
     wechaty
-      .on('login',    user => log.info('IoClient', `${user.name()} logined`))
-      .on('logout',   user => log.info('IoClient', `${user.name()} logouted`))
-      .on('scan',     (url, code) => log.info('IoClient', `[${code}] ${url}`))
+      .on('login',    user => log.info('IoClient', `${user.name()} logged in`))
+      .on('logout',   user => log.info('IoClient', `${user.name()} logged out`))
       .on('message',  msg => this.onMessage(msg))
+      .on('scan',     (url, code) => {
+        log.info('IoClient', [
+          `[${code}] ${url}`,
+          `Online QR Code Image: https://wechaty.js.org/qrcode/${encodeURIComponent(url)}`,
+        ].join('\n'))
+      })
   }
 
   private async startIo (): Promise<void> {
     log.verbose('IoClient', 'startIo() with token %s', this.options.token)
 
-    if (this.state.off()) {
+    if (this.state.inactive()) {
       const e = new Error('startIo() state.off() is true, skipped')
       log.warn('IoClient', e.message)
       throw e
@@ -166,7 +172,7 @@ export class IoClient {
     }
 
     this.io = new Io({
-      hostiePort : this.options.port,
+      servicePort : this.options.port,
       token      : this.options.token,
       wechaty    : this.options.wechaty,
     })
@@ -174,7 +180,7 @@ export class IoClient {
     try {
       await this.io.start()
     } catch (e) {
-      log.verbose('IoClient', 'startIo() init fail: %s', e.message)
+      log.verbose('IoClient', 'startIo() init fail: %s', (e as Error).message)
       throw e
     }
   }
@@ -191,7 +197,7 @@ export class IoClient {
     this.io = undefined
   }
 
-  private async onMessage (msg: Message) {
+  private async onMessage (msg: MessageInterface) {
     log.verbose('IoClient', 'onMessage(%s)', msg)
 
     // const from = m.from()
@@ -214,13 +220,13 @@ export class IoClient {
   public async stop (): Promise<void> {
     log.verbose('IoClient', 'stop()')
 
-    this.state.off('pending')
+    this.state.inactive('pending')
 
     await this.stopIo()
-    await this.stopHostie()
+    await this.stopPuppetServer()
     await this.options.wechaty.stop()
 
-    this.state.off(true)
+    this.state.inactive(true)
 
     // XXX 20161026
     // this.io = null
@@ -233,7 +239,7 @@ export class IoClient {
       await this.stop()
       await this.start()
     } catch (e) {
-      log.error('IoClient', 'restart() exception %s', e.message)
+      log.error('IoClient', 'restart() exception %s', (e as Error).message)
       throw e
     }
   }
@@ -241,18 +247,18 @@ export class IoClient {
   public async quit (): Promise<void> {
     log.verbose('IoClient', 'quit()')
 
-    if (this.state.off() === 'pending') {
+    if (this.state.inactive() === 'pending') {
       log.warn('IoClient', 'quit() with state.off() = `pending`, skipped')
       throw new Error('quit() with state.off() = `pending`')
     }
 
-    this.state.off('pending')
+    this.state.inactive('pending')
 
     try {
-      if (this.options.wechaty) {
-        await this.options.wechaty.stop()
-        // this.wechaty = null
-      } else { log.warn('IoClient', 'quit() no this.wechaty') }
+      // if (this.options.wechaty) {
+      await this.options.wechaty.stop()
+      // this.wechaty = null
+      // } else { log.warn('IoClient', 'quit() no this.wechaty') }
 
       if (this.io) {
         await this.io.stop()
@@ -260,10 +266,10 @@ export class IoClient {
       } else { log.warn('IoClient', 'quit() no this.io') }
 
     } catch (e) {
-      log.error('IoClient', 'exception: %s', e.message)
+      log.error('IoClient', 'exception: %s', (e as Error).message)
       throw e
     } finally {
-      this.state.off(true)
+      this.state.inactive(true)
     }
   }
 

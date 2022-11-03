@@ -1,7 +1,7 @@
 {
   "typescript.tsdk": "./node_modules/typescript/lib",
 
-  "editor.fontFamily": "'Fira Code iScript', Consolas, 'Courier New', monospace",
+  "editor.fontFamily": "Consolas, 'Courier New', monospace",
   "editor.fontLigatures": true,
 
   "editor.tokenColorCustomizations": {
@@ -71,14 +71,15 @@
     "typescript",
   ],
   "cSpell.words": [
+    "Gitter",
     "Wechaty",
     "appid",
+    "botie",
     "huan",
     "ioscat",
     "ipad",
     "lcov",
     "lijiarui",
-    "logonoff",
     "padchat",
     "padplus",
     "padpro",
@@ -90,6 +91,9 @@
     "thumbnailurl",
     "wechat",
     "weixin",
+    "wxwork",
+    "zbeekman",
     "zixia"
   ],
+  "typescript.format.semicolons": "remove",
 }

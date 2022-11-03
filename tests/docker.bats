@@ -1,14 +1,14 @@
 #!/usr/bin/env bats
 
 function dockerRun() {
-  docker run --rm -v "$(pwd)":/bot ${IMAGE_NAME:-'wechaty:test'} $@
+  docker run --rm -v "$(pwd)":/bot ${IMAGE_NAME:-'wechaty/wechaty:artifact'} $@
 }
 
 fixtures=tests/fixtures/docker
 
 @test "should succ with a simple javascript" {
   cd "$fixtures"
-  run dockerRun js-bot.js
+  run dockerRun cjs/js-bot.js
   [ "$status" -eq 0 ]
 }
 
@@ -18,9 +18,9 @@ fixtures=tests/fixtures/docker
   [ "$status" -ne 0 ]
 }
 
-@test "should succ with javascript es6 import syntax" {
+@test "should succ with javascript ESM import syntax" {
   cd "$fixtures"
-  run dockerRun es6-import.js
+  run dockerRun esm/es6-import.js
   [ "$status" -eq 0 ] # should succ
 }
 
@@ -32,25 +32,19 @@ fixtures=tests/fixtures/docker
 
 @test "should succ with a simple typescript" {
   cd "$fixtures"
-  run dockerRun ts-bot.ts
+  run dockerRun esm/ts-bot.ts
   [ "$status" -eq 0 ]
 }
 
-@test "should fail with unmatch types in typescript" {
+@test "should not fail with unmatch types in typescript (with `ts-node.transpileOnly=true`)" {
   cd "$fixtures"
   run dockerRun type-error.ts
-  [ "$status" -ne 0 ]
-}
-
-@test "should succ when we using 'import = require()' in typescript" {
-  cd "$fixtures"
-  run dockerRun import-require.ts
   [ "$status" -eq 0 ]
 }
 
 @test "should succ when using require with javascript" {
   cd "$fixtures/with-package-json/"
-  run dockerRun with-require.js
+  run dockerRun with-require.cjs
   [ "$status" -eq 0 ]
 }
 

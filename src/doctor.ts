@@ -21,10 +21,11 @@ import {
   createServer,
   Socket,
 }                   from 'net'
+import { spawnSync as spawn } from 'child_process'
 
 import {
   log,
-}                   from './config'
+}                   from 'wechaty-puppet'
 
 export class Doctor {
 
@@ -33,13 +34,12 @@ export class Doctor {
   }
 
   public chromedriverVersion (): string {
-    const spawn = require('child_process').spawnSync
     let version: string
     try {
       const cmd = spawn('chromedriver', ['--version'])
-      version = cmd.error || cmd.stdout.toString() || cmd.stderr.toString()
+      version = String(cmd.error) || cmd.stdout.toString() || cmd.stderr.toString()
     } catch (e) {
-      version = e.message
+      version = (e as Error).message
     }
     return version
   }

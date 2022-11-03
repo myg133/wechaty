@@ -1,4 +1,4 @@
-FROM ubuntu:eoan
+FROM debian:bullseye
 LABEL maintainer="Huan LI (李卓桓) <zixia@zixia.net>"
 
 ENV DEBIAN_FRONTEND     noninteractive
@@ -7,8 +7,7 @@ ENV LC_ALL              C.UTF-8
 ENV NODE_ENV            $NODE_ENV
 ENV NPM_CONFIG_LOGLEVEL warn
 
-# Installing the 'apt-utils' package gets rid of the 'debconf: delaying package configuration, since apt-utils is not installed'
-# error message when installing any other package with the apt-get package manager.
+# Instal the 'apt-utils' package to solve the error 'debconf: delaying package configuration, since apt-utils is not installed'
 # https://peteris.rocks/blog/quiet-and-unattended-installation-with-apt-get/
 RUN apt-get update \
   && apt-get install -y --no-install-recommends \
@@ -18,8 +17,9 @@ RUN apt-get update \
     bash \
     build-essential \
     ca-certificates \
-    curl \
+    chromium \
     coreutils \
+    curl \
     ffmpeg \
     figlet \
     git \
@@ -27,6 +27,7 @@ RUN apt-get update \
     jq \
     libgconf-2-4 \
     libtool \
+    libxtst6 \
     moreutils \
     python-dev \
     shellcheck \
@@ -37,23 +38,10 @@ RUN apt-get update \
   && apt-get purge --auto-remove \
   && rm -rf /tmp/* /var/lib/apt/lists/*
 
-RUN curl -sL https://deb.nodesource.com/setup_12.x | sudo -E bash - \
+RUN curl -sL https://deb.nodesource.com/setup_16.x | bash - \
     && apt-get update && apt-get install -y --no-install-recommends nodejs \
     && apt-get purge --auto-remove \
     && rm -rf /tmp/* /var/lib/apt/lists/*
-
-# https://github.com/GoogleChrome/puppeteer/blob/master/docs/troubleshooting.md
-# https://github.com/ebidel/try-puppeteer/blob/master/backend/Dockerfile
-# Install latest chrome dev package.
-# Note: this also installs the necessary libs so we don't need the previous RUN command.
-RUN  wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - \
-  && sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list' \
-  && apt-get update \
-  && apt-get install -y --no-install-recommends \
-    google-chrome-unstable \
-  && apt-get purge --auto-remove \
-  && rm -rf /tmp/* /var/lib/apt/lists/* \
-  && rm -rf /usr/bin/google-chrome* /opt/google/chrome-unstable
 
 WORKDIR /wechaty
 
@@ -63,7 +51,7 @@ RUN  npm install \
 
 COPY . .
 
-RUN ./scripts/generate-version.sh && rm -f src/version.spec.ts
+RUN ./scripts/generate-package-json.sh && rm -f src/package-json.spec.ts
 RUN  npm test \
   && npm run dist \
   && npm link
@@ -73,14 +61,20 @@ RUN  npm test \
 RUN  npm run puppet-install \
   && sudo rm -fr /tmp/* ~/.npm
 
+#
+# Enable ES Modules support #2232
+#   See: https://github.com/wechaty/wechaty/issues/2232
+#
+RUN echo '{"type": "module"}' > /package.json
+
 # Loading from node_modules Folders: https://nodejs.org/api/modules.html
 # If it is not found there, then it moves to the parent directory, and so on, until the root of the file system is reached.
 RUN  mkdir /node_modules \
-  && ln -sfv /usr/local/lib/node_modules/* /node_modules/ \
-  && ln -sfv /usr/lib/node_modules/*       /node_modules/ \
-  && ln -sfv /wechaty/node_modules/*       /node_modules/ \
-  && ln -sfv /wechaty/tsconfig.json        / \
-  && echo 'Linked Wechaty to Global'
+  && ln -sfv /usr/lib/node_modules/*  /node_modules/ \
+  && ln -sfv /wechaty/node_modules/*  /node_modules/ \
+  && /wechaty/bin/clean-json.js /wechaty/tsconfig.json \
+    | jq 'del(."ts-node")' > /tsconfig.json \
+  && echo 'Linked Wechaty & tsconfig.json to Global'
 
 WORKDIR /bot
 
@@ -103,8 +97,8 @@ LABEL \
   org.label-schema.vendor="Chatie" \
   org.label-schema.vcs-ref="$SOURCE_COMMIT" \
   org.label-schema.vcs-url="https://github.com/wechaty/wechaty" \
-  org.label-schema.docker.cmd="docker run -ti --rm zixia/wechaty <code.js>" \
-  org.label-schema.docker.cmd.test="docker run -ti --rm zixia/wechaty test" \
-  org.label-schema.docker.cmd.help="docker run -ti --rm zixia/wechaty help" \
+  org.label-schema.docker.cmd="docker run -ti --rm wechaty/wechaty <code.js>" \
+  org.label-schema.docker.cmd.test="docker run -ti --rm wechaty/wechaty test" \
+  org.label-schema.docker.cmd.help="docker run -ti --rm wechaty/wechaty help" \
   org.label-schema.docker.params="WECHATY_TOKEN=token token from https://www.chatie.io, WECHATY_LOG=verbose Set Verbose Log, TZ='Asia/Shanghai' TimeZone"
 
